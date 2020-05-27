@@ -533,6 +533,9 @@ void FixedwingAttitudeControl::Run()
 					float pitch_u = _pitch_ctrl.control_euler_rate(control_input);
 
 					mavlink_log_info(&_mavlink_log_pub, "Curent Trim : %f", (double)trim_pitch);
+
+					mavlink_log_info(&_mavlink_log_pub, "manual.aux2 %f",(double)_manual.aux1);
+
 					/* get the usual dt estimate */
 					uint64_t dt_micros = hrt_elapsed_time(&_last_run);
 					_last_run = hrt_absolute_time();
