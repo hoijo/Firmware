@@ -67,6 +67,13 @@
 #include <uORB/topics/vehicle_rates_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 
+
+#include <systemlib/mavlink_log.h>
+
+#include <drivers/drv_hrt.h>
+
+#include <uORB/topics/input_rc.h>
+
 using matrix::Eulerf;
 using matrix::Quatf;
 
@@ -105,6 +112,10 @@ private:
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};	/**< vehicle land detected subscription */
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};			/**< vehicle status subscription */
 	uORB::Subscription _vehicle_rates_sub{ORB_ID(vehicle_angular_velocity)};
+
+	uORB::Subscription _hoijo_rc{ORB_ID(input_rc)};
+
+	orb_advert_t	_mavlink_log_pub{nullptr};
 
 	uORB::SubscriptionData<airspeed_validated_s> _airspeed_validated_sub{ORB_ID(airspeed_validated)};
 
@@ -208,7 +219,12 @@ private:
 
 		(ParamFloat<px4::params::TRIM_PITCH>) _param_trim_pitch,
 		(ParamFloat<px4::params::TRIM_ROLL>) _param_trim_roll,
-		(ParamFloat<px4::params::TRIM_YAW>) _param_trim_yaw
+		(ParamFloat<px4::params::TRIM_YAW>) _param_trim_yaw,
+
+		(ParamFloat<px4::params::FW_PITCH_ID_IF>) _param_fw_pitch_id_if,
+		(ParamFloat<px4::params::FW_ROLL_ID_IF>) _param_fw_roll_id_if,
+		(ParamFloat<px4::params::FW_PITCH_ID_AM>) _param_fw_pitch_id_am,
+		(ParamFloat<px4::params::FW_ROLL_ID_AM>) _param_fw_roll_id_am
 	)
 
 	ECL_RollController		_roll_ctrl;
@@ -230,4 +246,7 @@ private:
 	void		vehicle_land_detected_poll();
 
 	float 		get_airspeed_and_update_scaling();
+
+	uint64_t _last_run;
+	float ID_TIME = 0.0f;
 };

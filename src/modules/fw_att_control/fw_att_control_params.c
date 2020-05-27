@@ -765,3 +765,56 @@ PARAM_DEFINE_FLOAT(FW_DTRIM_R_FLPS, 0.0f);
  * @increment 0.01
  */
 PARAM_DEFINE_FLOAT(FW_DTRIM_P_FLPS, 0.0f);
+
+/**
+ * If longitudinal system id
+ *
+ * IF this value 1, the system ID for the longitudinal axis proceeds.
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 0
+ * @decimal 2
+ * @increment 0
+ */
+PARAM_DEFINE_FLOAT(FW_PITCH_ID_IF, 0.0f);
+
+/**
+ * If lateral system id
+ *
+ * IF this value 1, the system ID for the lateral axis proceeds.
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 0
+ * @decimal 2
+ * @increment 0
+ */
+PARAM_DEFINE_FLOAT(FW_ROLL_ID_IF, 0.0f);
+
+/**
+ * If longitudinal system id
+ *
+ * The range of this value means the range of elevator angles.
+ *
+ * @group FW Attitude Control
+ * @min -1
+ * @max 1
+ * @decimal 2
+ * @increment 0
+ */
+PARAM_DEFINE_FLOAT(FW_PITCH_ID_AM, 0.0f);
+
+/**
+ * If lateral system id
+ *
+ * The range of this value means the range of aileron angles.
+ *
+ * @group FW Attitude Control
+ * @min -1
+ * @max 1
+ * @decimal 2
+ * @increment 0
+ */
+PARAM_DEFINE_FLOAT(FW_ROLL_ID_AM, 0.0f);
+

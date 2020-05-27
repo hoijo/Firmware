@@ -45,7 +45,7 @@ FixedwingAttitudeControl::FixedwingAttitudeControl(bool vtol) :
 	WorkItem(MODULE_NAME, px4::wq_configurations::attitude_ctrl),
 	_actuators_0_pub(vtol ? ORB_ID(actuator_controls_virtual_fw) : ORB_ID(actuator_controls_0)),
 	_attitude_sp_pub(vtol ? ORB_ID(fw_virtual_attitude_setpoint) : ORB_ID(vehicle_attitude_setpoint)),
-	_loop_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": cycle"))
+	_loop_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")), _last_run(0), ID_TIME(0)
 {
 	// check if VTOL first
 	if (vtol) {
@@ -526,13 +526,50 @@ void FixedwingAttitudeControl::Run()
 					/* Run attitude RATE controllers which need the desired attitudes from above, add trim */
 					float roll_u = _roll_ctrl.control_euler_rate(control_input);
 					_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
-
 					if (!PX4_ISFINITE(roll_u)) {
 						_roll_ctrl.reset_integrator();
 					}
 
 					float pitch_u = _pitch_ctrl.control_euler_rate(control_input);
-					_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+
+					mavlink_log_info(&_mavlink_log_pub, "Curent Trim : %f", (double)trim_pitch);
+					/* get the usual dt estimate */
+					uint64_t dt_micros = hrt_elapsed_time(&_last_run);
+					_last_run = hrt_absolute_time();
+					float dt = (float)dt_micros * 1e-6f;
+
+					ID_TIME += dt;
+					float ID_INPUT_NUMBER = 0.05f;
+					if (ID_TIME < 30){
+						mavlink_log_info(&_mavlink_log_pub, "System ID Ready");
+						_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+						mavlink_log_info(&_mavlink_log_pub, "ID : %f", (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					}
+					else if(30.0f <= ID_TIME && ID_TIME < 33.0f){ // 3sec up
+						float ID_INPUT = ID_INPUT_NUMBER + trim_pitch;
+						mavlink_log_info(&_mavlink_log_pub, "3sec UP ID : %f", (double)ID_INPUT);
+						_actuators.control[actuator_controls_s::INDEX_PITCH] = ID_INPUT;
+					}
+					else if(33.0f <= ID_TIME && ID_TIME < 35.0f){ // 2sec down
+						float ID_INPUT = -ID_INPUT_NUMBER + trim_pitch;
+						mavlink_log_info(&_mavlink_log_pub, "2sec DOWN ID : %f", (double)ID_INPUT);
+						_actuators.control[actuator_controls_s::INDEX_PITCH] = ID_INPUT;
+					}
+					else if(35.0f <= ID_TIME && ID_TIME < 36.0f){ // 1sec up
+						float ID_INPUT = ID_INPUT_NUMBER + trim_pitch;
+						mavlink_log_info(&_mavlink_log_pub, "1sec UP ID : %f", (double)ID_INPUT);
+						_actuators.control[actuator_controls_s::INDEX_PITCH] = ID_INPUT;
+					}
+					else if(36.0f <= ID_TIME && ID_TIME < 37.0f){ // 1sec down
+						float ID_INPUT = -ID_INPUT_NUMBER + trim_pitch;
+						mavlink_log_info(&_mavlink_log_pub, "1sec DOWN ID : %f", (double)ID_INPUT);
+						_actuators.control[actuator_controls_s::INDEX_PITCH] = ID_INPUT;
+					}
+					else{
+						_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+						mavlink_log_info(&_mavlink_log_pub, "ID : %f", (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+					}
+
 
 					if (!PX4_ISFINITE(pitch_u)) {
 						_pitch_ctrl.reset_integrator();
@@ -581,6 +618,40 @@ void FixedwingAttitudeControl::Run()
 					}
 				}
 
+
+				///////////////////////////////////////////////// Hoijo Edit - System ID
+				/* get the usual dt estimate */
+				// uint64_t dt_micros = hrt_elapsed_time(&_last_run);
+				// _last_run = hrt_absolute_time();
+				// float dt = (float)dt_micros * 1e-6f;
+
+				// mavlink_log_info(&_mavlink_log_pub, "AUX1 %f", (double)_manual.aux1);
+				// mavlink_log_info(&_mavlink_log_pub, "dt : %f", (double)dt);
+
+
+				// This function is activative when RC is connected.
+				// if(_manual.aux1 > 0.5f){
+				// 	ID_TIME = 0.0f;
+				// }
+
+				// if(dt > 20.0){
+				// 	ID_TIME = 0.0f;
+				// }
+				// else{
+				// 	ID_TIME += dt;
+
+				// 	if(ID_TIME< 3.0f){
+				// 		mavlink_log_info(&_mavlink_log_pub,"Ready");
+				// 	}
+				// 	else if(ID_TIME >= 3.0f && ID_TIME < 6.0f){
+				// 		mavlink_log_info(&_mavlink_log_pub,"3 Second ID");
+				// 	}
+				// 	else if(ID_TIME >= 6.0f && ID_TIME < 8.0f){
+				// 		mavlink_log_info(&_mavlink_log_pub,"2 Second ID");
+				// 	}
+				// }
+
+
 				/*
 				 * Lazily publish the rate setpoint (for analysis, the actuators are published below)
 				 * only once available
@@ -592,6 +663,8 @@ void FixedwingAttitudeControl::Run()
 				_rates_sp.timestamp = hrt_absolute_time();
 
 				_rate_sp_pub.publish(_rates_sp);
+
+				// mavlink_log_info(&_mavlink_log_pub, "check vcontrol enable!!!!");
 
 			} else {
 				vehicle_rates_setpoint_poll();
@@ -611,6 +684,8 @@ void FixedwingAttitudeControl::Run()
 
 				_actuators.control[actuator_controls_s::INDEX_THROTTLE] = PX4_ISFINITE(_rates_sp.thrust_body[0]) ?
 						_rates_sp.thrust_body[0] : 0.0f;
+
+				// mavlink_log_info(&_mavlink_log_pub, "check vcontrol disable @@@@@");
 			}
 
 			rate_ctrl_status_s rate_ctrl_status{};
@@ -654,6 +729,10 @@ void FixedwingAttitudeControl::Run()
 			_actuators_2_pub.publish(_actuators_airframe);
 		}
 	}
+
+
+
+
 
 	perf_end(_loop_perf);
 }
