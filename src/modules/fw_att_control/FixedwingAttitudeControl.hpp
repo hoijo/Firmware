@@ -224,7 +224,13 @@ private:
 		(ParamFloat<px4::params::FW_PITCH_ID_IF>) _param_fw_pitch_id_if,
 		(ParamFloat<px4::params::FW_ROLL_ID_IF>) _param_fw_roll_id_if,
 		(ParamFloat<px4::params::FW_PITCH_ID_AM>) _param_fw_pitch_id_am,
-		(ParamFloat<px4::params::FW_ROLL_ID_AM>) _param_fw_roll_id_am
+		(ParamFloat<px4::params::FW_ROLL_ID_AM>) _param_fw_roll_id_am,
+
+		(ParamFloat<px4::params::FW_SYS_M_ID_UP_1>) _param_fw_sys_m_id_up_1,
+		(ParamFloat<px4::params::FW_SYS_M_ID_UP_2>) _param_fw_sys_m_id_up_2,
+		(ParamFloat<px4::params::FW_SYS_M_ID_UP_3>) _param_fw_sys_m_id_up_3,
+		(ParamFloat<px4::params::FW_SYS_M_ID_UP_4>) _param_fw_sys_m_id_up_4,
+		(ParamFloat<px4::params::FW_SYS_M_ID_UP_5>) _param_fw_sys_m_id_up_5
 	)
 
 	ECL_RollController		_roll_ctrl;

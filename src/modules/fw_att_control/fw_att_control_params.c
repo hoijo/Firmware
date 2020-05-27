@@ -772,8 +772,8 @@ PARAM_DEFINE_FLOAT(FW_DTRIM_P_FLPS, 0.0f);
  * IF this value 1, the system ID for the longitudinal axis proceeds.
  *
  * @group FW Attitude Control
- * @min 0
- * @max 0
+ * @min 0.0
+ * @max 1.0
  * @decimal 2
  * @increment 0
  */
@@ -785,8 +785,8 @@ PARAM_DEFINE_FLOAT(FW_PITCH_ID_IF, 0.0f);
  * IF this value 1, the system ID for the lateral axis proceeds.
  *
  * @group FW Attitude Control
- * @min 0
- * @max 0
+ * @min 0.0
+ * @max 1.0
  * @decimal 2
  * @increment 0
  */
@@ -803,7 +803,7 @@ PARAM_DEFINE_FLOAT(FW_ROLL_ID_IF, 0.0f);
  * @decimal 2
  * @increment 0
  */
-PARAM_DEFINE_FLOAT(FW_PITCH_ID_AM, 0.0f);
+PARAM_DEFINE_FLOAT(FW_PITCH_ID_AM, 0.05f);
 
 /**
  * If lateral system id
@@ -816,5 +816,69 @@ PARAM_DEFINE_FLOAT(FW_PITCH_ID_AM, 0.0f);
  * @decimal 2
  * @increment 0
  */
-PARAM_DEFINE_FLOAT(FW_ROLL_ID_AM, 0.0f);
+PARAM_DEFINE_FLOAT(FW_ROLL_ID_AM, 0.05f);
 
+/**
+ * MULTI_STEP_INPUT System id
+ *
+ * MULTI_STEP_INPUT Setting
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 100.0
+ * @decimal
+ * @increment
+ */
+PARAM_DEFINE_FLOAT(FW_SYS_M_ID_UP_1, 6.0f);
+
+/**
+ * MULTI_STEP_INPUT System id
+ *
+ * MULTI_STEP_INPUT Setting
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 100.0
+ * @decimal
+ * @increment
+ */
+PARAM_DEFINE_FLOAT(FW_SYS_M_ID_UP_2, 8.0f);
+
+/**
+ * MULTI_STEP_INPUT System id
+ *
+ * MULTI_STEP_INPUT Setting
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 100.0
+ * @decimal
+ * @increment
+ */
+PARAM_DEFINE_FLOAT(FW_SYS_M_ID_UP_3, 9.0f);
+
+/**
+ * MULTI_STEP_INPUT System id
+ *
+ * MULTI_STEP_INPUT Setting
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 100.0
+ * @decimal
+ * @increment
+ */
+PARAM_DEFINE_FLOAT(FW_SYS_M_ID_UP_4, 10.0f);
+
+/**
+ * MULTI_STEP_INPUT System id
+ *
+ * MULTI_STEP_INPUT Setting
+ *
+ * @group FW Attitude Control
+ * @min 0
+ * @max 100.0
+ * @decimal
+ * @increment
+ */
+PARAM_DEFINE_FLOAT(FW_SYS_M_ID_UP_5, 30.0f);
