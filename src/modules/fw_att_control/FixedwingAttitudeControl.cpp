@@ -539,6 +539,10 @@ void FixedwingAttitudeControl::Run()
 					_last_run = hrt_absolute_time();
 					float dt = (float)dt_micros * 1e-6f;
 
+					if(_param_fw_roll_id_if.get() > 0.5f && _param_fw_pitch_id_if.get() > 0.5f){
+						mavlink_log_info(&_mavlink_log_pub, "You need to check system id parameter");
+					}
+
 					if (_manual.aux1 < 0.5f){
 						ID_TIME = 0.0f;
 						_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
@@ -575,7 +579,7 @@ void FixedwingAttitudeControl::Run()
 							mavlink_log_info(&_mavlink_log_pub, "System ID [+1sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
 						}
 						else if(_param_fw_sys_m_id_up_3.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_4.get()){
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = _param_fw_roll_id_am.get() + trim_roll;
+							_actuators.control[actuator_controls_s::INDEX_ROLL] = -_param_fw_roll_id_am.get() + trim_roll;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [-1sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
 						}
 						else if(_param_fw_sys_m_id_up_4.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_5.get()){
@@ -618,7 +622,7 @@ void FixedwingAttitudeControl::Run()
 							mavlink_log_info(&_mavlink_log_pub, "System ID [+1sec] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
 						}
 						else if(_param_fw_sys_m_id_up_3.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_4.get()){
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = _param_fw_pitch_id_am.get() + trim_pitch;
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = -_param_fw_pitch_id_am.get() + trim_pitch;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [-1sec] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
 						}
 						else if(_param_fw_sys_m_id_up_4.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_5.get()){
