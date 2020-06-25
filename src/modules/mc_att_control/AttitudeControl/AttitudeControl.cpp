@@ -50,6 +50,7 @@ void AttitudeControl::setProportionalGain(const matrix::Vector3f &proportional_g
 	if (_yaw_w > 1e-4f) {
 		_proportional_gain(2) /= _yaw_w;
 	}
+	PX4_INFO("COAXIAL TEST MC_CONTROLLER PART_1");
 }
 
 matrix::Vector3f AttitudeControl::update(matrix::Quatf q, matrix::Quatf qd, const float yawspeed_feedforward)

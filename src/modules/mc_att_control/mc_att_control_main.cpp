@@ -253,6 +253,7 @@ MulticopterAttitudeControl::publish_rates_setpoint()
 void
 MulticopterAttitudeControl::Run()
 {
+
 	if (should_exit()) {
 		_vehicle_attitude_sub.unregisterCallback();
 		exit_and_cleanup();

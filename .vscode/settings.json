@@ -178,5 +178,10 @@
         "workbench.statusBar.feedback.visible": false,
         "yaml.schemas": {
                 "${workspaceRoot}/validation/module_schema.yaml": "${workspaceRoot}/src/modules/*/module.yaml"
-        }
+        },
+        "python.autoComplete.extraPaths": [
+                "/home/pc/catkin_ws/devel/lib/python2.7/dist-packages",
+                "/opt/ros/melodic/lib/python2.7/dist-packages"
+        ],
+        "C_Cpp.errorSquiggles": "Disabled"
 }

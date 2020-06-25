@@ -57,6 +57,7 @@
 
 #include <AttitudeControl.hpp>
 
+
 /**
  * Multicopter attitude control app start / stop handling function
  */
@@ -116,6 +117,8 @@ private:
 
 	uORB::Publication<vehicle_rates_setpoint_s>	_v_rates_sp_pub{ORB_ID(vehicle_rates_setpoint)};			/**< rate setpoint publication */
 	uORB::Publication<vehicle_attitude_setpoint_s>	_vehicle_attitude_setpoint_pub;
+
+	orb_advert_t	_mavlink_log_pub{nullptr};
 
 	struct vehicle_attitude_s		_v_att {};		/**< vehicle attitude */
 	struct vehicle_attitude_setpoint_s	_v_att_sp {};		/**< vehicle attitude setpoint */

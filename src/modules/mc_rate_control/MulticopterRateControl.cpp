@@ -123,6 +123,7 @@ MulticopterRateControl::get_landing_gear_state()
 void
 MulticopterRateControl::Run()
 {
+
 	if (should_exit()) {
 		_vehicle_angular_velocity_sub.unregisterCallback();
 		exit_and_cleanup();
@@ -281,6 +282,8 @@ MulticopterRateControl::Run()
 			actuators.control[actuator_controls_s::INDEX_THROTTLE] = PX4_ISFINITE(_thrust_sp) ? _thrust_sp : 0.0f;
 			actuators.control[actuator_controls_s::INDEX_LANDING_GEAR] = (float)_landing_gear.landing_gear;
 			actuators.timestamp_sample = angular_velocity.timestamp_sample;
+
+			// PX4_INFO("COAXIAL TEST MC_CONTROLLER PART");
 
 			// scale effort by battery status if enabled
 			if (_param_mc_bat_scale_en.get()) {

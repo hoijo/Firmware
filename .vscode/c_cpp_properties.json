@@ -3,10 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/Firmware"
+                "${workspaceFolder}/"
             ],
             "defines": [],
-            "compilerPath": "/home/pc/gcc-arm-none-eabi-7-2017-q4-major/bin/arm-none-eabi-gcc"
+            "compilerPath": "/home/pc/gcc-arm-none-eabi-7-2017-q4-major/bin/arm-none-eabi-gcc",
+            "compileCommands": "${workspaceFolder}/build/px4_fmu-v3_default/compile_commands.json"
         }
     ],
     "version": 4

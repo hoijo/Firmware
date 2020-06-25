@@ -545,11 +545,11 @@ void FixedwingAttitudeControl::Run()
 
 					if (_manual.aux1 < 0.5f){
 						ID_TIME = 0.0f;
-						_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
-						_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
-						mavlink_log_info(&_mavlink_log_pub, "Non-Activate System ID(Aux1 value %f): Now Pitch u : %f, Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH], (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						mavlink_log_info(&_mavlink_log_pub, "Time %f", (double)ID_TIME);
+						// mavlink_log_info(&_mavlink_log_pub, "Non-Activate System ID(Aux1 value %f): Now Pitch u : %f, Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH], (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+						// mavlink_log_info(&_mavlink_log_pub, "Time %f", (double)ID_TIME);
 					}
+					_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+					_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
 
 
 					// _actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
