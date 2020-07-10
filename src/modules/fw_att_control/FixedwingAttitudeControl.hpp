@@ -74,6 +74,8 @@
 
 #include <uORB/topics/input_rc.h>
 
+// #include <mavlink/mavlink_main.h>
+
 using matrix::Eulerf;
 using matrix::Quatf;
 
@@ -255,4 +257,5 @@ private:
 
 	uint64_t _last_run;
 	float ID_TIME = 0.0f;
+	float simu_time = 0.0f;
 };

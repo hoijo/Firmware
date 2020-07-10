@@ -299,7 +299,7 @@ public:
 	 * Set to true to generate RC_INPUT messages on the system bus from
 	 * MAVLink messages.
 	 *
-	 * @param generation_enabled If set to true, generate RC_INPUT messages
+	 * @param generation_enabled set_generate_virtual_rc_input
 	 */
 	void			set_generate_virtual_rc_input(bool generation_enabled) { _generate_rc = generation_enabled; }
 

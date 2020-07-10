@@ -33,6 +33,8 @@
 px4_add_module(
 	MODULE modules__fw_att_control
 	MAIN fw_att_control
+	INCLUDES
+		${PX4_SOURCE_DIR}/mavlink/include/mavlink/v2.0
 	SRCS
 		FixedwingAttitudeControl.cpp
 		FixedwingAttitudeControl.hpp

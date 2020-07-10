@@ -64,6 +64,7 @@ FixedwingAttitudeControl::FixedwingAttitudeControl(bool vtol) :
 	_pitch_ctrl.set_max_rate_pos(radians(_param_fw_acro_y_max.get()));
 	_pitch_ctrl.set_max_rate_neg(radians(_param_fw_acro_y_max.get()));
 	_yaw_ctrl.set_max_rate(radians(_param_fw_acro_z_max.get()));
+	ID_TIME = 0.0f;
 }
 
 FixedwingAttitudeControl::~FixedwingAttitudeControl()
@@ -539,19 +540,22 @@ void FixedwingAttitudeControl::Run()
 					_last_run = hrt_absolute_time();
 					float dt = (float)dt_micros * 1e-6f;
 
-					if(_param_fw_roll_id_if.get() > 0.5f && _param_fw_pitch_id_if.get() > 0.5f){
-						mavlink_log_info(&_mavlink_log_pub, "You need to check system id parameter");
-					}
+					// if(_param_fw_roll_id_if.get() > 0.5f && _param_fw_pitch_id_if.get() > 0.5f){
+					// 	mavlink_log_info(&_mavlink_log_pub, "You need to check system id parameter");
+					// }
 
-					if (_manual.aux1 < 0.5f){
-						ID_TIME = 0.0f;
-						// mavlink_log_info(&_mavlink_log_pub, "Non-Activate System ID(Aux1 value %f): Now Pitch u : %f, Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH], (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						// mavlink_log_info(&_mavlink_log_pub, "Time %f", (double)ID_TIME);
-					}
-					_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
-					_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
+					// if (_manual.aux1 < 0.5f){
+					// 	ID_TIME = 0.0f;
+					// 	// mavlink_log_info(&_mavlink_log_pub, "Non-Activate System ID(Aux1 value %f): Now Pitch u : %f, Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH], (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	// mavlink_log_info(&_mavlink_log_pub, "Time %f", (double)ID_TIME);
+					// }
+					// _actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
 
+					// double test_mav_link = buttons.x;
+					// double test_mav_link;
 
+					// test_mav_link = mavlink_msg_manual_control_get_buttons(1.0);
+					// mavlink_log_info(&_mavlink_log_pub, "20200704 test %f", (double)test_mav_link);
 					// _actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
 					// if (_manual.aux1 < 0.5f && _param_fw_roll_id_if.get() < 0.5f){
 					// 	ID_TIME = 0.0f;
@@ -559,39 +563,39 @@ void FixedwingAttitudeControl::Run()
 					// 	mavlink_log_info(&_mavlink_log_pub, "Non-Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
 					// }
 
-					if (_manual.aux1 > 0.5f && _param_fw_roll_id_if.get() > 0.5f){
-						ID_TIME += dt;
+					// if (_manual.aux1 > 0.5f && _param_fw_roll_id_if.get() > 0.5f){
+					// 	ID_TIME += dt;
 
-						if (ID_TIME < 3.0f){
-							mavlink_log_info(&_mavlink_log_pub, "System ID Ready: Non-Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
-						}
-						else if(3.0f <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_1.get()){
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = _param_fw_roll_id_am.get() + trim_roll;
-							mavlink_log_info(&_mavlink_log_pub, "System ID [+3sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						}
-						else if(_param_fw_sys_m_id_up_1.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_2.get()){
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = -_param_fw_roll_id_am.get() + trim_roll;
-							mavlink_log_info(&_mavlink_log_pub, "System ID [-2sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						}
-						else if(_param_fw_sys_m_id_up_2.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_3.get()){
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = _param_fw_roll_id_am.get() + trim_roll;
-							mavlink_log_info(&_mavlink_log_pub, "System ID [+1sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						}
-						else if(_param_fw_sys_m_id_up_3.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_4.get()){
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = -_param_fw_roll_id_am.get() + trim_roll;
-							mavlink_log_info(&_mavlink_log_pub, "System ID [-1sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						}
-						else if(_param_fw_sys_m_id_up_4.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_5.get()){
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = trim_roll;
-							mavlink_log_info(&_mavlink_log_pub, "System ID [Phugoid Mode] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						}
-						else {
-							_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
-							mavlink_log_info(&_mavlink_log_pub, "Done System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
-						}
+					// 	if (ID_TIME < 3.0f){
+					// 		mavlink_log_info(&_mavlink_log_pub, "System ID Ready: Non-Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
+					// 	}
+					// 	else if(3.0f <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_1.get()){
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = _param_fw_roll_id_am.get() + trim_roll;
+					// 		mavlink_log_info(&_mavlink_log_pub, "System ID [+3sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	}
+					// 	else if(_param_fw_sys_m_id_up_1.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_2.get()){
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = -_param_fw_roll_id_am.get() + trim_roll;
+					// 		mavlink_log_info(&_mavlink_log_pub, "System ID [-2sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	}
+					// 	else if(_param_fw_sys_m_id_up_2.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_3.get()){
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = _param_fw_roll_id_am.get() + trim_roll;
+					// 		mavlink_log_info(&_mavlink_log_pub, "System ID [+1sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	}
+					// 	else if(_param_fw_sys_m_id_up_3.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_4.get()){
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = -_param_fw_roll_id_am.get() + trim_roll;
+					// 		mavlink_log_info(&_mavlink_log_pub, "System ID [-1sec] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	}
+					// 	else if(_param_fw_sys_m_id_up_4.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_5.get()){
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = trim_roll;
+					// 		mavlink_log_info(&_mavlink_log_pub, "System ID [Phugoid Mode] Run: Activate System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	}
+					// 	else {
+					// 		_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
+					// 		mavlink_log_info(&_mavlink_log_pub, "Done System ID(Aux1 value %f): Now Roll u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_ROLL]);
+					// 	}
 
-					}
+					// }
 
 
 
@@ -601,40 +605,64 @@ void FixedwingAttitudeControl::Run()
 					// 	mavlink_log_info(&_mavlink_log_pub, "Non-Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
 					// 	mavlink_log_info(&_mavlink_log_pub, "Time %f", (double)ID_TIME);
 					// }
-					if (_manual.aux1 > 0.5f && _param_fw_pitch_id_if.get() > 0.5f){
-						ID_TIME += dt;
-						mavlink_log_info(&_mavlink_log_pub, "Time %f", (double)ID_TIME);
+					simu_time = simu_time + dt;
 
-						if (ID_TIME < 3.0f){
+					// mavlink_log_info(&_mavlink_log_pub, " simu_time Time %f", (double)simu_time);
+					if(simu_time < 60.0f){
+						ID_TIME = 0.0f;
+					_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+					_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
+					mavlink_log_info(&_mavlink_log_pub, " pitch_u : %f", (double)pitch_u);
+					mavlink_log_info(&_mavlink_log_pub, " trim_pitch : %f", (double)trim_pitch);
+					mavlink_log_info(&_mavlink_log_pub, " simu time < 60");
+					}
+					else if (simu_time >= 60.0f && simu_time < 200.0f){
+						ID_TIME += dt;
+						mavlink_log_info(&_mavlink_log_pub, "ID_TIME Time %f", (double)ID_TIME);
+
+						if (ID_TIME < 10.0f){
 							mavlink_log_info(&_mavlink_log_pub, "System ID Ready: Non-Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = 0.22f;
 						}
-						else if(3.0f <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_1.get()){
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = _param_fw_pitch_id_am.get() + trim_pitch;
+						else if(10.0f <= ID_TIME && ID_TIME < 13.0f){
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = _param_fw_pitch_id_am.get() + 0.22f;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [+3sec] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+							_actuators.control[actuator_controls_s::INDEX_ROLL] = 0.0f;
 						}
-						else if(_param_fw_sys_m_id_up_1.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_2.get()){
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = -_param_fw_pitch_id_am.get() + trim_pitch;
+						else if(13.0f <= ID_TIME && ID_TIME < 15.0f){
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = -_param_fw_pitch_id_am.get() + 0.22f;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [-2sec] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+							_actuators.control[actuator_controls_s::INDEX_ROLL] = 0.0f;
 						}
-						else if(_param_fw_sys_m_id_up_2.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_3.get()){
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = _param_fw_pitch_id_am.get() + trim_pitch;
+						else if(15.0f <= ID_TIME && ID_TIME < 16.0f){
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = _param_fw_pitch_id_am.get() + 0.22f;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [+1sec] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+							_actuators.control[actuator_controls_s::INDEX_ROLL] = 0.0f;
 						}
-						else if(_param_fw_sys_m_id_up_3.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_4.get()){
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = -_param_fw_pitch_id_am.get() + trim_pitch;
+						else if(16.0f <= ID_TIME && ID_TIME < 17.0f){
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = -_param_fw_pitch_id_am.get() + 0.22f;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [-1sec] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+							_actuators.control[actuator_controls_s::INDEX_ROLL] = 0.0f;
 						}
-						else if(_param_fw_sys_m_id_up_4.get() <= ID_TIME && ID_TIME < _param_fw_sys_m_id_up_5.get()){
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = trim_pitch;
+						else if(17.0f <= ID_TIME && ID_TIME < 200.0f){
+							_actuators.control[actuator_controls_s::INDEX_PITCH] = 0.22f;
 							mavlink_log_info(&_mavlink_log_pub, "System ID [Phugoid Mode] Run: Activate System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+							_actuators.control[actuator_controls_s::INDEX_ROLL] = 0.0f;
 						}
-						else {
-							_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
-							mavlink_log_info(&_mavlink_log_pub, "Done System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
-						}
+						// else {
+						// 	_actuators.control[actuator_controls_s::INDEX_PITCH] = 0.22f;
+						// 	mavlink_log_info(&_mavlink_log_pub, "Done System ID(Aux1 value %f): Now Pitch u : %f",(double)_manual.aux1, (double)_actuators.control[actuator_controls_s::INDEX_PITCH]);
+						// 	_actuators.control[actuator_controls_s::INDEX_ROLL] = 0.0f;
+						// }
 
 					}
+					else if(simu_time >=200.0f){
+						ID_TIME = 0.0f;
+					_actuators.control[actuator_controls_s::INDEX_PITCH] = (PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
+					_actuators.control[actuator_controls_s::INDEX_ROLL] = (PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
+					mavlink_log_info(&_mavlink_log_pub, "Done");
+					}
+
 
 					float yaw_u = 0.0f;
 
@@ -724,12 +752,13 @@ void FixedwingAttitudeControl::Run()
 				_rates_sp.timestamp = hrt_absolute_time();
 
 				_rate_sp_pub.publish(_rates_sp);
+				mavlink_log_info(&_mavlink_log_pub, "set 1    ???");
 
 				// mavlink_log_info(&_mavlink_log_pub, "check vcontrol enable!!!!");
 
 			} else {
+				mavlink_log_info(&_mavlink_log_pub, "set  222   ???");
 				vehicle_rates_setpoint_poll();
-
 				_roll_ctrl.set_bodyrate_setpoint(_rates_sp.roll);
 				_yaw_ctrl.set_bodyrate_setpoint(_rates_sp.yaw);
 				_pitch_ctrl.set_bodyrate_setpoint(_rates_sp.pitch);

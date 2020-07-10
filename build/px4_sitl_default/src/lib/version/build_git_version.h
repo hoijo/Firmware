@@ -3,10 +3,10 @@
 /* Do not edit! */
 #pragma once
 
-#define PX4_GIT_VERSION_STR  "c52ad418620448decf2a984cee8dbc47650830c6"
-#define PX4_GIT_VERSION_BINARY 0xc52ad418620448de
-#define PX4_GIT_TAG_STR  "v1.11.0-beta2-30-gc52ad41862-dirty"
-#define PX4_GIT_BRANCH_NAME  "system_id"
+#define PX4_GIT_VERSION_STR  "5c31e3bc6ce847727b3ccb7af2eb37fbaa4a062c"
+#define PX4_GIT_VERSION_BINARY 0x5c31e3bc6ce84772
+#define PX4_GIT_TAG_STR  "v1.11.0-beta2-31-g5c31e3bc6c-dirty"
+#define PX4_GIT_BRANCH_NAME  "system_id_sitl"
 
 #define ECL_LIB_GIT_VERSION_STR  "24f2e60b7eff664d0035d5f75f410073be28d894"
 #define ECL_LIB_GIT_VERSION_BINARY 0x24f2e60b7eff664d
